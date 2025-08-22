@@ -2,28 +2,39 @@
 const express = require('express')
 const app = express()
 app.use(express.json())
-const uuid = require('uuid') //uuidv4()
+const uuid = require('uuid')
 
 
-//VARIÁVEIS
+// VARIÁVEIS
 const PORT = 3000
 const orders = []
 
-// ROTAS
-app.get('/order', (request, response) => {
-    return response.json(orders)
-})
-app.get('/order/:id', (request, response) => {
+
+// MIDDWARES
+const checkOrderId = (request, response, next) => {
 
     const {id} =request.params
 
-    console.log(`Retornando id:${id}`)
     const index = orders.findIndex(order => order.id === id)
     if (index < 0) {
         return response.json({error: "Order not found."})    
     }
 
-    console.log(`Retornando index: ${orders[index]}`)
+    request.orderIndex = index
+    request.orderId = id
+
+    next()
+}
+
+
+// ROTAS
+app.get('/order', (request, response) => {
+    return response.json(orders)
+})
+
+app.get('/order/:id', checkOrderId, (request, response) => {
+
+    const index = request.orderIndex
 
     return response.json(orders[index])
 })
@@ -36,39 +47,26 @@ app.post('/order', (request, response) => {
 
     orders.push(newOrder)
     
-    return response.status(201).json({newOrder})
+    return response.status(201).json(newOrder)
 })
 
-app.put('/order/:id', (request, response) => {
+app.put('/order/:id', checkOrderId, (request, response) => {
 
-    const {id} =request.params
-
+    const id = request.orderId
+    const index = request.orderIndex
+    
     const {order, clientName, price} = request.body
-
-    const index = orders.findIndex(order => order.id === id)
-    if (index < 0) {
-        return response.json({error: "Order not found."})    
-    }
-
+    
     const updateOrder = {id, order, clientName, price} 
 
     orders[index] = updateOrder
 
-
-    console.log(`Retornando index: ${orders[index]}`)
-
     return response.json(orders[index])
 })
 
+app.delete('/order/:id', checkOrderId, (request, response) => {
 
-app.delete('/order/:id', (request, response) => {
-
-    const {id} =request.params
-    const index = orders.findIndex(order => order.id === id)
-    
-    if (index < 0) {
-        return response.json({error: "Order not found."})    
-    }
+    const {index} =request.orderIndex
     
     orders.splice(index,1)
 
@@ -76,8 +74,5 @@ app.delete('/order/:id', (request, response) => {
 })
 
 
-
-
 // LISTEN
 app.listen(PORT)
-console.log("🌐 Server is online")
