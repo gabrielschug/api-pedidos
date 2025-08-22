@@ -25,7 +25,7 @@ O objetivo deste projeto é consolidar meus estudos em **criação de APIs REST,
 git clone https://github.com/gabrielschug/api-pedidos.git
 
 # 2. Entrar na pasta do projeto
-cd index.js
+cd api-pedidos
 
 # 3. Instalar dependências
 npm install
