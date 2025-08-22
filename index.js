@@ -1,16 +1,16 @@
-// BIBLIOTECAS
+// IMPORTS
 const express = require('express')
 const app = express()
 app.use(express.json())
 const uuid = require('uuid')
 
 
-// VARIÁVEIS
+// VARIABLES
 const PORT = 3000
 const orders = []
 
 
-// MIDDWARES
+// MIDDWARE
 const checkOrderId = (request, response, next) => {
 
     const {id} =request.params
@@ -27,7 +27,7 @@ const checkOrderId = (request, response, next) => {
 }
 
 
-// ROTAS
+// ROUTES
 app.get('/order', (request, response) => {
     return response.json(orders)
 })
